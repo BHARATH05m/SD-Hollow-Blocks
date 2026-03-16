@@ -14,7 +14,7 @@ const app = express();
 // CORS - allow frontend origins
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? [process.env.FRONTEND_URL, 'https://your-app.vercel.app']
+    ? [process.env.FRONTEND_URL].filter(Boolean)
     : ['http://localhost:5173', 'http://localhost:3000'],
   credentials: true
 }));
@@ -27,18 +27,8 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Serve uploaded files statically with proper MIME types
-app.use('/uploads', express.static(uploadsDir, {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.mp4')) {
-      res.setHeader('Content-Type', 'video/mp4');
-    } else if (path.endsWith('.webm')) {
-      res.setHeader('Content-Type', 'video/webm');
-    } else if (path.endsWith('.mov')) {
-      res.setHeader('Content-Type', 'video/quicktime');
-    }
-  }
-}));
+// Serve uploaded files statically (fallback for any local files)
+app.use('/uploads', express.static(uploadsDir));
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({

@@ -1,89 +1,46 @@
 const express = require('express');
 const router = express.Router();
-const path = require('path');
+const upload = require('../middleware/upload');
 
-// Test route to verify the router is working
-router.get('/test', (req, res) => {
-  console.log('🧪 Test route hit!');
-  res.json({ message: 'Upload router is working!' });
+// Upload thumbnail + backview (image or video) to Cloudinary
+router.post('/multiple', upload.fields([
+  { name: 'thumbnail', maxCount: 1 },
+  { name: 'backview', maxCount: 1 }
+]), (req, res) => {
+  try {
+    if (!req.files || (!req.files.thumbnail && !req.files.backview)) {
+      return res.status(400).json({ message: 'No files uploaded' });
+    }
+
+    const result = {};
+
+    if (req.files.thumbnail?.[0]) {
+      result.thumbnailUrl = req.files.thumbnail[0].path; // Cloudinary URL
+    }
+
+    if (req.files.backview?.[0]) {
+      const backviewFile = req.files.backview[0];
+      result.backviewUrl = backviewFile.path; // Cloudinary URL
+      const isVideo = backviewFile.mimetype.startsWith('video/') ||
+                      /\.(mp4|mov|avi|mkv|webm)$/i.test(backviewFile.originalname);
+      result.backViewType = isVideo ? 'video' : 'image';
+    }
+
+    res.json({ message: 'Files uploaded successfully', ...result });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
-// Simple test route without multer
-router.post('/simple-test', (req, res) => {
-  console.log('🧪 Simple test route hit!');
-  res.json({ message: 'Simple upload test working!' });
+// Single image upload
+router.post('/single', upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    res.json({ message: 'Image uploaded successfully', imageUrl: req.file.path });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
-
-// Load multer middleware
-let upload;
-try {
-  upload = require('../middleware/upload');
-  console.log('✅ Multer middleware loaded successfully');
-} catch (error) {
-  console.error('❌ Error loading multer middleware:', error);
-}
-
-// Upload single image (only if multer loaded successfully)
-if (upload) {
-  router.post('/single', upload.single('image'), (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ message: 'No file uploaded' });
-      }
-
-      const imageUrl = `/uploads/${req.file.filename}`;
-      res.json({
-        message: 'Image uploaded successfully',
-        imageUrl: imageUrl,
-        filename: req.file.filename,
-        originalName: req.file.originalname,
-        size: req.file.size
-      });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-
-  // Upload multiple images (for thumbnail and back view)
-  router.post('/multiple', upload.fields([
-    { name: 'thumbnail', maxCount: 1 },
-    { name: 'backview', maxCount: 1 }
-  ]), (req, res) => {
-    try {
-      console.log('📤 Multiple upload request received');
-      console.log('📁 Files received:', req.files);
-      
-      if (!req.files || (!req.files.thumbnail && !req.files.backview)) {
-        console.log('❌ No files uploaded');
-        return res.status(400).json({ message: 'No files uploaded' });
-      }
-
-      const result = {};
-
-      if (req.files.thumbnail && req.files.thumbnail[0]) {
-        result.thumbnailUrl = `/uploads/${req.files.thumbnail[0].filename}`;
-        result.thumbnailFilename = req.files.thumbnail[0].filename;
-        console.log('✅ Thumbnail uploaded:', result.thumbnailUrl);
-      }
-
-      if (req.files.backview && req.files.backview[0]) {
-        result.backviewUrl = `/uploads/${req.files.backview[0].filename}`;
-        result.backviewFilename = req.files.backview[0].filename;
-        console.log('✅ Backview uploaded:', result.backviewUrl);
-      }
-
-      console.log('✅ Upload successful, returning:', result);
-      res.json({
-        message: 'Images uploaded successfully',
-        ...result
-      });
-    } catch (error) {
-      console.error('❌ Upload error:', error);
-      res.status(500).json({ message: error.message });
-    }
-  });
-} else {
-  console.log('❌ Multer not available, upload routes disabled');
-}
 
 module.exports = router;
