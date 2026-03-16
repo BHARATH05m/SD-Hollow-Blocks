@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:4000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -41,11 +41,11 @@ export const ordersAPI = {
   addPhone: (id, customerPhone) => api.put(`/orders/${id}/phone`, { customerPhone }),
   addMessage: (id, message, sender) => api.post(`/orders/${id}/message`, { message, sender }),
   getMessages: (id, userId, role) => api.get(`/orders/${id}/messages`, { params: { userId, role } }),
-  reportDeliveryIssue: (id, reportType, reportMessage, reportedBy) => 
+  reportDeliveryIssue: (id, reportType, reportMessage, reportedBy) =>
     api.post(`/orders/report/${id}`, { reportType, reportMessage, reportedBy }),
-  respondToReport: (id, reportId, ownerResponse) => 
+  respondToReport: (id, reportId, ownerResponse) =>
     api.put(`/orders/report/${id}/${reportId}/respond`, { ownerResponse }),
-  resolveReport: (id, reportId) => 
+  resolveReport: (id, reportId) =>
     api.put(`/orders/report/${id}/${reportId}/resolve`),
 };
 
@@ -53,13 +53,13 @@ export const ordersAPI = {
 export const generalMessagesAPI = {
   getConversations: (userId, role) => api.get('/general-messages', { params: { userId, role } }),
   getUsers: () => api.get('/general-messages/users'),
-  startConversation: (ownerId, customerId, initialMessage) => 
+  startConversation: (ownerId, customerId, initialMessage) =>
     api.post('/general-messages/start', { ownerId, customerId, initialMessage }),
-  addMessage: (conversationId, message, sender, userId) => 
+  addMessage: (conversationId, message, sender, userId) =>
     api.post(`/general-messages/${conversationId}/message`, { message, sender, userId }),
-  getMessages: (conversationId, userId) => 
+  getMessages: (conversationId, userId) =>
     api.get(`/general-messages/${conversationId}/messages`, { params: { userId } }),
-  archiveConversation: (conversationId, userId) => 
+  archiveConversation: (conversationId, userId) =>
     api.put(`/general-messages/${conversationId}/archive`, { userId }),
 };
 
@@ -69,24 +69,18 @@ export const uploadAPI = {
     const formData = new FormData();
     formData.append('image', file);
     return api.post('/upload/single', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
   multiple: (thumbnailFile, backviewFile) => {
-    // Check if at least one file is provided
     if (!thumbnailFile && !backviewFile) {
       return Promise.reject(new Error('At least one file must be provided'));
     }
-    
     const formData = new FormData();
     if (thumbnailFile) formData.append('thumbnail', thumbnailFile);
     if (backviewFile) formData.append('backview', backviewFile);
     return api.post('/upload/multiple', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
 };

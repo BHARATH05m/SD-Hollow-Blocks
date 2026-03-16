@@ -10,6 +10,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import OwnerNavbar from "../components/OwnerNavbar.jsx";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const HenManagement = () => {
   const [date, setDate] = useState("");
@@ -198,6 +200,58 @@ const HenManagement = () => {
       totalWeightGain,
       fcr,
     });
+  };
+
+  const downloadPDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(20);
+    doc.setTextColor(34, 197, 94);
+    doc.text('Hen Management Report', 14, 20);
+
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
+
+    if (resultsVisible) {
+      doc.setFontSize(13);
+      doc.setTextColor(0);
+      doc.text('Performance Metrics', 14, 40);
+
+      autoTable(doc, {
+        startY: 44,
+        head: [['Metric', 'Value']],
+        body: [
+          ['Average Weight (kg)', averageWeight != null ? averageWeight.toFixed(3) : '--'],
+          ['Total Weight Gain (kg)', totalWeightGain != null ? totalWeightGain.toFixed(2) : '--'],
+          ['FCR (Feed Conversion Ratio)', fcr != null ? fcr.toFixed(3) : '--'],
+          ['Total Feed Given (kg)', totalFeed || '--'],
+          ['Date', date || '--'],
+          ['Sampled Chickens', sampleCount],
+          ['Total Chicken Count', totalChickenCount || '--'],
+        ],
+        theme: 'grid',
+        headStyles: { fillColor: [34, 197, 94] },
+        styles: { fontSize: 11 },
+        columnStyles: { 0: { cellWidth: 100 } },
+      });
+    }
+
+    const tableY = resultsVisible ? doc.lastAutoTable.finalY + 10 : 40;
+    doc.setFontSize(13);
+    doc.setTextColor(0);
+    doc.text('Weight & FCR Trend (Last 5 Records)', 14, tableY);
+
+    autoTable(doc, {
+      startY: tableY + 4,
+      head: [['Date', 'Average Weight (kg)', 'FCR']],
+      body: history.map(h => [h.date, h.averageWeight, h.fcr]),
+      theme: 'striped',
+      headStyles: { fillColor: [37, 99, 235] },
+      styles: { fontSize: 10 },
+    });
+
+    doc.save(`hen-management-report-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   const getFcrColor = () => {
@@ -673,6 +727,32 @@ const HenManagement = () => {
                     }}
                   >
                     Reset
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={downloadPDF}
+                    style={{
+                      padding: '10px 16px',
+                      borderRadius: '999px',
+                      border: '1px solid #bfdbfe',
+                      cursor: 'pointer',
+                      background: '#eff6ff',
+                      color: '#1d4ed8',
+                      fontWeight: 500,
+                      fontSize: '13px',
+                      transition: 'background 0.15s ease, transform 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = '#dbeafe';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = '#eff6ff';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    📄 Download PDF
                   </button>
 
                   <button

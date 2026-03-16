@@ -3,7 +3,6 @@ import { Routes, Route } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import OwnerPage from './pages/OwnerPage.jsx';
-import HenPage from './pages/HenPage.jsx';
 import HenManagement from './pages/HenManagement.jsx';
 import HollowBlocksPage from './pages/HollowBlocksPage.jsx';
 import AmountPage from './pages/AmountPage.jsx';
@@ -22,7 +21,6 @@ function App() {
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/owner" element={<OwnerPage />} />
-      <Route path="/owner/hen" element={<HenPage />} />
       <Route path="/owner/hen-management" element={<HenManagement />} />
       <Route path="/owner/hollow-blocks" element={<HollowBlocksPage />} />
       <Route path="/owner/amount" element={<AmountPage />} />

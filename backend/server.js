@@ -3,13 +3,22 @@ const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+require('dotenv').config();
 const connectDB = require('./config/database');
 
 // Connect to MongoDB
 connectDB();
 
 const app = express();
-app.use(cors());
+
+// CORS - allow frontend origins
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? [process.env.FRONTEND_URL, 'https://your-app.vercel.app']
+    : ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // Create uploads directory if it doesn't exist
@@ -154,7 +163,7 @@ app.post('/api/upload/multiple', (req, res) => {
   });
 });
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
   console.log('Authentication system using database UserLogin model');
