@@ -16,6 +16,7 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'https://sd-hollow-blocks.vercel.app',
+  'https://main.d3rrdi69ihzt8i.amplifyapp.com',
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -24,6 +25,8 @@ app.use(cors({
     if (!origin) return callback(null, true);
     // Allow any vercel.app subdomain for preview deployments
     if (origin.endsWith('.vercel.app')) return callback(null, true);
+    // Allow any amplifyapp.com subdomain
+    if (origin.endsWith('.amplifyapp.com')) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
     callback(new Error(`CORS blocked: ${origin}`));
   },
