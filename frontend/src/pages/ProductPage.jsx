@@ -219,7 +219,7 @@ function ProductPage() {
 
   // Filter items based on search term
   const filteredItems = items.filter(item => 
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+    (item.name || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Search bar style
@@ -436,7 +436,7 @@ function ProductPage() {
                 <div style={{ marginBottom: '12px', color: '#565959', fontSize: '13px' }}>
                   <strong>
                     {(() => {
-                      const itemNameLower = item.name.toLowerCase();
+                      const itemNameLower = (item.name || '').toLowerCase();
                       if (itemNameLower.includes('m-sand') || itemNameLower.includes('msand') || 
                           itemNameLower.includes('p-sand') || itemNameLower.includes('psand')) {
                         return 'Units Available:';
@@ -448,7 +448,7 @@ function ProductPage() {
 
                 {/* Delivery Message for Various Products - Always Visible */}
                 {(() => {
-                  const itemNameLower = item.name.toLowerCase();
+                  const itemNameLower = (item.name || '').toLowerCase();
                   const isSandProduct = itemNameLower.includes('m-sand') || itemNameLower.includes('msand') || 
                                        itemNameLower.includes('p-sand') || itemNameLower.includes('psand');
                   const isHollowBlocks = itemNameLower.includes('hollow block') || itemNameLower.includes('hollowblock') ||
