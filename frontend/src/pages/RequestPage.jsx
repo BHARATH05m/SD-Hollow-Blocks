@@ -140,10 +140,10 @@ function RequestPage() {
     
     // Search by multiple criteria
     const results = orders.filter(order => {
-      const orderId = order.id;
+      const orderId = order.id || '';
       const orderIdLower = orderId.toLowerCase();
-      const customerEmail = order.userId.toLowerCase();
-      const orderStatus = order.status.toLowerCase();
+      const customerEmail = (order.userId || '').toLowerCase();
+      const orderStatus = (order.status || '').toLowerCase();
       
       // Search criteria - prioritize exact order ID match
       const matchesExactOrderId = orderId === searchTerm || orderIdLower === searchTermLower;
@@ -166,7 +166,7 @@ function RequestPage() {
       
       // Search in order items
       const matchesItems = order.items.some(item => 
-        item.name.toLowerCase().includes(searchTermLower)
+        (item.name || '').toLowerCase().includes(searchTermLower)
       );
       
       // Search by total amount (if query is a number)
