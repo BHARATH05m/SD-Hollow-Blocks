@@ -78,24 +78,6 @@ function OwnerNavbar() {
         SD HOLLOW BLOCKS
       </div>
       <Link
-        to="/owner/hen"
-        style={isActive('/owner/hen') ? activeLinkStyle : linkStyle}
-        onMouseEnter={(e) => {
-          if (!isActive('/owner/hen')) {
-            e.target.style.background = 'rgba(255,255,255,0.15)';
-            e.target.style.transform = 'translateY(-2px)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isActive('/owner/hen')) {
-            e.target.style.background = 'transparent';
-            e.target.style.transform = 'translateY(0)';
-          }
-        }}
-      >
-        HEN PAGE
-      </Link>
-      <Link
         to="/owner/hen-management"
         style={isActive('/owner/hen-management') ? activeLinkStyle : linkStyle}
         onMouseEnter={(e) => {
@@ -130,24 +112,6 @@ function OwnerNavbar() {
         }}
       >
         HOLLOW BLOCKS
-      </Link>
-      <Link
-        to="/owner/amount"
-        style={isActive('/owner/amount') ? activeLinkStyle : linkStyle}
-        onMouseEnter={(e) => {
-          if (!isActive('/owner/amount')) {
-            e.target.style.background = 'rgba(255,255,255,0.15)';
-            e.target.style.transform = 'translateY(-2px)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isActive('/owner/amount')) {
-            e.target.style.background = 'transparent';
-            e.target.style.transform = 'translateY(0)';
-          }
-        }}
-      >
-        AMOUNT
       </Link>
       <Link
         to="/owner/overall-process"
